@@ -42,5 +42,25 @@ namespace Sprotify.Web.Controllers
             var playlist = await _playlistService.GetPlaylist(id);
             return View(Mapper.Map<PlaylistDetails>(playlist));
         }
+
+        [Route("new-playlist")]
+        public IActionResult NewPlaylist()
+        {
+            return View();
+        }
+
+        [Route("new-playlist")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> NewPlaylist(NewPlaylistModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var playlist = await _playlistService.CreatePlaylist(model.Title, model.Description);
+                return RedirectToAction("Playlist", new { Id = playlist.Id });
+            }
+
+            return View(model);
+        }
     }
 }

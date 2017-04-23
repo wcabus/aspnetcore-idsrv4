@@ -11,9 +11,13 @@ namespace Sprotify.API.Services
         Playlist GetPlaylist(Guid playlistId, bool includeSongs = false);
         IEnumerable<Song> GetSongsFromPlaylist(Guid playlistId);
         Song GetSongFromPlaylist(Guid playlistId, Guid songId);
+
+        void CreatePlaylist(Playlist playlist);
+
         void AddSongToPlaylist(Guid playlistId, Song song);
         void UpdateSong(Song song);
         void DeleteSong(Song song);
+
         bool Save();
     }
 }

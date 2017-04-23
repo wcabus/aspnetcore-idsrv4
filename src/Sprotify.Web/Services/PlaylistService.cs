@@ -19,5 +19,10 @@ namespace Sprotify.Web.Services
         {
             return await Get<PlaylistWithSongs>($"playlists/{id}?expand=true").ConfigureAwait(false);
         }
+
+        public async Task<PlaylistWithSongs> CreatePlaylist(string title, string description)
+        {
+            return await Post<PlaylistWithSongs>($"playlists", new { Title = title, Description = description });
+        }
     }
 }

@@ -8,6 +8,8 @@ namespace Sprotify.API.Services
 {
     public class SprotifyRepository : ISprotifyRepository, IDisposable
     {
+        private static readonly Guid DefaultOwner = Guid.Parse("24ec92ba-e6a3-421f-a599-2a0bf88c807a");
+
         private SprotifyContext _context;
         public SprotifyRepository(SprotifyContext context)
         {
@@ -25,6 +27,14 @@ namespace Sprotify.API.Services
         public void DeleteSong(Song song)
         {
             _context.Songs.Remove(song);
+        }
+
+        public void CreatePlaylist(Playlist playlist)
+        {
+            playlist.Id = Guid.NewGuid();
+            playlist.OwnerId = DefaultOwner;
+
+            _context.Playlists.Add(playlist);
         }
 
         public Playlist GetPlaylist(Guid playlistId, bool includeSongs = false)

@@ -26,7 +26,7 @@ namespace Sprotify.API.Controllers
             return Ok(Mapper.Map<IEnumerable<Playlist>>(playlists));
         }
 
-        [HttpGet("{playlistId}")]
+        [HttpGet("{playlistId}", Name = "GetPlaylist")]
         public IActionResult GetPlaylist(Guid playlistId, [FromQuery] bool expand)
         {
             var playlist = _sprotifyRepository.GetPlaylist(playlistId, expand);
@@ -43,6 +43,38 @@ namespace Sprotify.API.Controllers
             }
 
             return Ok(Mapper.Map<Playlist>(playlist));
-         }
+        }
+
+        [HttpPost]
+        public IActionResult CreatePlaylist([FromBody] PlaylistForCreation playlistForCreation)
+        {
+            if (playlistForCreation == null)
+            {
+                return BadRequest();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return new UnprocessableEntityObjectResult(ModelState);
+            }
+
+            var mappedPlaylist = Mapper.Map<Entities.Playlist>(playlistForCreation);
+
+            _sprotifyRepository.CreatePlaylist(mappedPlaylist);
+
+            if (!_sprotifyRepository.Save())
+            {
+                throw new Exception("Creating the playlist failed.");
+            }
+
+            var createdPlaylistToReturn = Mapper.Map<Models.Playlist>(mappedPlaylist);
+
+            return CreatedAtRoute("GetPlaylist",
+                new
+                {
+                    playlistId = mappedPlaylist.Id
+                },
+                createdPlaylistToReturn);
+        }
     }
 }

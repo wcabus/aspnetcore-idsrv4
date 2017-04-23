@@ -74,10 +74,10 @@ namespace Sprotify.API
             {
                 cfg.CreateMap<Entities.Playlist, Models.Playlist>();
                 cfg.CreateMap<Entities.Playlist, Models.PlaylistWithSongs>();
+                cfg.CreateMap<Models.PlaylistForCreation, Entities.Playlist>();
                 cfg.CreateMap<Entities.Song, Models.Song>();
                 cfg.CreateMap<Models.SongForCreation, Entities.Song>();
                 cfg.CreateMap<Models.SongForUpdate, Entities.Song>().ReverseMap();
-                cfg.CreateMap<Entities.Song, Models.Song>();
             });
 
             // test for, and if required, migrate the DB
