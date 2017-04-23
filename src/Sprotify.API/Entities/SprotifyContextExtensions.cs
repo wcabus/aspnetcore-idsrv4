@@ -30,19 +30,22 @@ namespace Sprotify.API.Entities
                          {
                              Id = new Guid("90f5b378-5d91-4776-7c42-08d472cad0c0"),
                               Band = "Smashing Pumpkins",
-                              Title = "Bodies"
+                              Title = "Bodies",
+                              Duration = new TimeSpan(0, 4, 12)
                          },
                           new Song()
                          {
                              Id = new Guid("86fecb64-c59f-4ede-b5b2-0486a2b80aa8"),
                               Band = "Alice in Chains",
-                              Title = "Rooster"
+                              Title = "Rooster",
+                              Duration = new TimeSpan(0, 6, 14)
                          },
                         new Song()
                          {
                              Id = new Guid("ad6b9090-0353-4738-90c2-80e1254e5b88"),
                               Band = "Foo Fighters",
-                              Title = "Everlong"
+                              Title = "Everlong",
+                              Duration = new TimeSpan(0, 4, 11)
                          }
                     }
                 },
@@ -58,31 +61,36 @@ namespace Sprotify.API.Entities
                          {
                              Id = new Guid("cc6f1fad-ece3-42d0-b703-a8f0ae95a4ac"),
                               Band = "Nirvana",
-                              Title = "Aneurysm"
+                              Title = "Aneurysm",
+                              Duration = new TimeSpan(0, 4, 46)
                          },
                           new Song()
                          {
                              Id = new Guid("5718200c-9926-4685-b1b0-b1903b23b64a"),
                              Band = "Nirvana",
-                             Title = "Scentless Apprentice"
+                             Title = "Scentless Apprentice",
+                              Duration = new TimeSpan(0, 3, 48)
                          },
                            new Song()
                          {
                              Id = new Guid("a0809a6d-f4bf-4d32-bece-8358452f9379"),
                               Band = "Nirvana",
-                              Title = "Help me, I'm Hungry"
+                              Title = "Help me, I'm Hungry",
+                              Duration = new TimeSpan(0, 2, 40)
                          },
                             new Song()
                          {
                              Id = new Guid("cbd04f26-e441-4e61-aeae-a65f31915e0b"),
                               Band = "Nirvana",
-                              Title = "Pennyroyal Tea"
+                              Title = "Pennyroyal Tea",
+                              Duration = new TimeSpan(0, 3, 41)
                          },
                         new Song()
                          {
                              Id = new Guid("6d5ad6bc-6c8f-4795-940b-1b467a5cb1c6"),
                               Band = "Nirvana",
-                              Title = "Dumb"
+                              Title = "Dumb",
+                              Duration = new TimeSpan(0, 2, 53)
                          }
                     }
                 },
@@ -98,37 +106,43 @@ namespace Sprotify.API.Entities
                          {
                              Id = new Guid("d305389d-2d95-409c-90f4-5cdb96c138a0"),
                               Band = "Scooter ",
-                              Title = "How Much is the Fish?"
+                              Title = "How Much is the Fish?",
+                              Duration = new TimeSpan(0, 3, 47)
                          },
                          new Song()
                          {
                              Id = new Guid("4d3dfd48-ece8-4419-826a-a392394766f0"),
                              Band = "Meghan Trainor",
-                             Title = "It's all About the Bass"
+                             Title = "All About That Bass",
+                              Duration = new TimeSpan(0, 3, 08)
                          },
                          new Song()
                          {
                              Id = new Guid("ba69680c-9f56-4803-af05-cca8214d4da0"),
                               Band = "Good Shape",
-                              Title = "Bake my Cod"
+                              Title = "Bake my Cod",
+                              Duration = new TimeSpan(0, 3, 40)
                          },
                          new Song()
                          {
                              Id = new Guid("41fe6518-01bf-46f0-ad0d-63e031b42b93"),
                               Band = "Jimmy Frey",
-                              Title = "Breng die zalmen naar Sandra"
+                              Title = "Breng die zalmen naar Sandra",
+                              Duration = new TimeSpan(0, 2, 58)
                          },
                          new Song()
                          {
                              Id = new Guid("5fca5d89-05bf-4bb0-8be5-f66ded50cb6e"),
                               Band = "Moby",
-                              Title = "That's When I Reach for my Revolver"
+                              Title = "That's When I Reach for my Revolver",
+                              Duration = new TimeSpan(0, 3, 57)
                          },
                          new Song()
                          {
                              Id = new Guid("11eabfb8-d211-4575-8e51-64fbcc729a37"),
                               Band = "Reel Big Fish",
-                              Title = "Take On Me"
+                              Title = "Take On Me",
+                              Duration = new TimeSpan(0, 3, 19)
                          }
                     }
                 }

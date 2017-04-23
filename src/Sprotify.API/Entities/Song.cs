@@ -16,6 +16,9 @@ namespace Sprotify.API.Entities
         [MaxLength(150)]
         public string Band { get; set; }
 
+        [Required]
+        public TimeSpan Duration { get; set; }
+
         [ForeignKey("PlaylistId")]
         public Playlist Playlist { get; set; }
         public Guid PlaylistId { get; set; }
