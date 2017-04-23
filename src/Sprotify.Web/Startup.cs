@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Sprotify.Web.Services;
+using System.Net.Http;
 
 namespace Sprotify.Web
 {
@@ -26,6 +28,13 @@ namespace Sprotify.Web
             // Enable custom options
             services.AddOptions();
 
+            // Add services
+            var client = new HttpClient();
+            var baseUri = Configuration.GetValue<string>("ApiBaseUri");
+
+            services.AddScoped(isp => new PlaylistService(client, baseUri));
+
+            // Add MVC services
             services.AddMvc();
         }
 
@@ -44,6 +53,13 @@ namespace Sprotify.Web
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
+            AutoMapper.Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<Models.Api.Playlist, Models.Music.PlaylistInYourMusic>();
+                cfg.CreateMap<Models.Api.PlaylistWithSongs, Models.Music.PlaylistDetails>();
+                cfg.CreateMap<Models.Api.Song, Models.Music.Song>();
+            });
 
             app.UseStaticFiles();
 

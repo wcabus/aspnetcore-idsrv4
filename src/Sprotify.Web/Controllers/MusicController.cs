@@ -1,13 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Sprotify.Web.Models.Music;
+using Sprotify.Web.Services;
+using System.Threading.Tasks;
+using AutoMapper;
+using System.Collections.Generic;
 
 namespace Sprotify.Web.Controllers
 {
     public class MusicController : Controller
     {
+        private readonly PlaylistService _playlistService;
+
+        public MusicController(PlaylistService playlistService)
+        {
+            _playlistService = playlistService;
+        }
+
         [Route("search")]
         public IActionResult Search()
         {
@@ -21,39 +30,17 @@ namespace Sprotify.Web.Controllers
         }
 
         [Route("your-music")]
-        public IActionResult YourMusic()
+        public async Task<IActionResult> YourMusic()
         {
-            var data = new[] 
-            {
-                new PlaylistInfo
-                {
-                    Title = "Guardians of the Galaxy Vol. 2",
-                    Owner = new OwnerInfo
-                    {
-                        UserName = "wcabus",
-                        FullName = "Wesley Cabus"
-                    }
-                },
-                new PlaylistInfo
-                {
-                    Title = "Distant Worlds - Music from Final Fantasy",
-                    Owner = new OwnerInfo
-                    {
-                        UserName = "wcabus",
-                        FullName = "Wesley Cabus"
-                    }
-                },
-                new PlaylistInfo
-                {
-                    Title = "Theme Awesome",
-                    Owner = new OwnerInfo
-                    {
-                        UserName = "jwilms",
-                        FullName = "Jan Wilms"
-                    }
-                }
-            };
-            return View(data);
+            var playlists = await _playlistService.GetPlaylists();
+            return View(Mapper.Map<IEnumerable<PlaylistInYourMusic>>(playlists));
+        }
+
+        [Route("playlist/{id:guid}")]
+        public async Task<IActionResult> Playlist([FromRoute]Guid id)
+        {
+            var playlist = await _playlistService.GetPlaylist(id);
+            return View(Mapper.Map<PlaylistDetails>(playlist));
         }
     }
 }
