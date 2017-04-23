@@ -1,0 +1,67 @@
+﻿@using Sprotify.Web.Models.Music
+@model IEnumerable<PlaylistInfo>
+@{
+    ViewData["Title"] = "Your Music";
+}
+
+<div class="hw-accelerate">
+    <section class="contentSpacing">
+        <div>
+            <div class="asideButton-container">
+                <nav class="A0f-D9GnabaNkGDu5722F">
+                    <ul class="_2qxszZDSg4070SwogL5b7O">
+                        <li class="_1IZEXeoITlpZoDbSTO79x4">
+                            <a class="Vg0L1vwJXv5JSYn-HUx0C" asp-action="Playlists">PLAYLISTS</a>
+                        </li>
+                        <li class="_1IZEXeoITlpZoDbSTO79x4">
+                            <a class="Vg0L1vwJXv5JSYn-HUx0C" asp-action="DailyMix">YOUR DAILY MIX</a>
+                        </li>
+                        <li class="_1IZEXeoITlpZoDbSTO79x4">
+                            <a class="Vg0L1vwJXv5JSYn-HUx0C" asp-action="Songs">SONGS</a>
+                        </li>
+                        <li class="_1IZEXeoITlpZoDbSTO79x4">
+                            <a class="Vg0L1vwJXv5JSYn-HUx0C" asp-action="Albums">ALBUMS</a>
+                        </li>
+                        <li class="_1IZEXeoITlpZoDbSTO79x4">
+                            <a class="Vg0L1vwJXv5JSYn-HUx0C" asp-action="Artists">ARTISTS</a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="asideButton">
+                    <button class="btn btn-green btn-small asideButton-button">NEW PLAYLIST</button>
+                </div>
+            </div>
+        </div>
+        <div class="_2ZxgeVkL10CBSK4Q8YP29g">
+            <div>
+                <section>
+                    <div class="container-fluid container-fluid--noSpaceAround">
+                        <div class="_1V5hjg9Q-uySwVgMc32TQb row">
+                            @foreach (var playlist in Model)
+                            {
+                                <div class="col-xs-6 col-sm-4 col-md-4 col-lg-3 col-xl-2">
+                                    <div class="media-object" style="max-width: 300px">
+                                        <div class="hoverable">
+                                            <div class="react-contextmenu-wrapper">
+                                                <a class="cover-art shadow light actionable"></a>
+                                            </div>
+                                            <div class="mo-info">
+                                                <div class="react-contextmenu-wrapper">
+                                                    <a class="mo-info-name" asp-action="Playlist">@playlist.Title</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mo-owner">
+                                            <span>By</span>
+                                            <span><a asp-controller="User" asp-action="Info" asp-route-username="@playlist.Owner.UserName">@playlist.Owner.FullName</a></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </section>
+</div>
