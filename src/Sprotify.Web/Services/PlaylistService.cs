@@ -22,7 +22,12 @@ namespace Sprotify.Web.Services
 
         public async Task<PlaylistWithSongs> CreatePlaylist(string title, string description)
         {
-            return await Post<PlaylistWithSongs>($"playlists", new { Title = title, Description = description });
+            return await Post<PlaylistWithSongs>("playlists", new { Title = title, Description = description });
+        }
+
+        public async Task<Song> AddSongToPlaylist(Guid id, string title, string band, TimeSpan duration)
+        {
+            return await Post<Song>($"playlists/{id}/songs", new { Title = title, Band = band, Duration = duration });
         }
     }
 }

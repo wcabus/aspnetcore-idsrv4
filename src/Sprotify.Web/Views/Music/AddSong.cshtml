@@ -1,6 +1,6 @@
-﻿@model NewPlaylistModel
+﻿@model AddSongModel
 @{ 
-    ViewData["Title"] = "New Playlist";
+    ViewData["Title"] = "Add Song";
 }
 
 <div class="hw-accelerate">
@@ -8,8 +8,8 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-xs-12 col-lg-12 col-xl-12 col-sticky">
-                    <h2 class="_136vzZKMy7E_xDfv7uATJ_">New Playlist</h2>
-                    <form asp-action="NewPlaylist" method="post">
+                    <h2 class="_136vzZKMy7E_xDfv7uATJ_">Add Song</h2>
+                    <form asp-action="AddSong" asp-route-id="@ViewData["playlistId"]" method="post">
                         <div class="form-horizontal">
                             <div class="form-group">
                                 <label asp-for="Title" class="col-md-2 control-label"></label>
@@ -19,13 +19,20 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label asp-for="Description" class="col-md-2 control-label"></label>
+                                <label asp-for="Band" class="col-md-2 control-label"></label>
                                 <div class="col-md-10">
-                                    <input asp-for="Description" class="form-control" />
-                                    <span asp-validation-for="Description" class="text-danger"></span>
+                                    <input asp-for="Band" class="form-control" />
+                                    <span asp-validation-for="Band" class="text-danger"></span>
                                 </div>
                             </div>
-                            <button class="btn btn-green" type="submit">Create</button>
+                            <div class="form-group">
+                                <label asp-for="Duration" class="col-md-2 control-label"></label>
+                                <div class="col-md-1">
+                                    <input asp-for="Duration" class="form-control" placeholder="00:00:00" />
+                                    <span asp-validation-for="Duration" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <button class="btn btn-green" type="submit">Add</button>
                         </div>
                     </form>
                 </div>

@@ -7,6 +7,7 @@ namespace Sprotify.Web.Models.Api
         public Guid Id { get; set; }
         public string Title { get; set; }
         public string Band { get; set; }
+        public TimeSpan Duration { get; set; }
         public Guid PlaylistId { get; set; }
     }
 }

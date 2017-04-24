@@ -62,5 +62,27 @@ namespace Sprotify.Web.Controllers
 
             return View(model);
         }
+
+        [Route("playlist/{id:guid}/add-song")]
+        public IActionResult AddSong(Guid id)
+        {
+            ViewData["playlistId"] = id;
+            return View();
+        }
+
+        [Route("playlist/{id:guid}/add-song")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddSong(Guid id, AddSongModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var song = await _playlistService.AddSongToPlaylist(id, model.Title, model.Band, model.Duration);
+                return RedirectToAction("Playlist", new { Id = id });
+            }
+
+            ViewData["playlistId"] = id;
+            return View(model);
+        }
     }
 }
