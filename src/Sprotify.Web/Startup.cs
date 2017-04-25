@@ -33,6 +33,7 @@ namespace Sprotify.Web
             var baseUri = Configuration.GetValue<string>("ApiBaseUri");
 
             services.AddScoped(isp => new PlaylistService(client, baseUri));
+            services.AddScoped(isp => new StatsService(client, baseUri));
 
             // Add MVC services
             services.AddMvc();
