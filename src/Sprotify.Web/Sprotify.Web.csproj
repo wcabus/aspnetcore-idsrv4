@@ -27,5 +27,6 @@
   <ItemGroup>
     <Folder Include="Views\User\" />
   </ItemGroup>
+  <ProjectExtensions><VisualStudio><UserProperties Properties_4launchSettings_1json__JSONSchema="" /></VisualStudio></ProjectExtensions>
 
 </Project>
