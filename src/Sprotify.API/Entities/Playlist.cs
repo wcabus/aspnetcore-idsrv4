@@ -19,6 +19,8 @@ namespace Sprotify.API.Entities
         [Required]
         public Guid OwnerId { get; set; }
 
+        public virtual User Owner { get; set; }
+
         public ICollection<Song> Songs { get; set; }
                = new List<Song>();
     }
