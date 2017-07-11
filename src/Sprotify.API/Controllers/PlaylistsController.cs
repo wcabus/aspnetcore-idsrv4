@@ -4,8 +4,6 @@ using Sprotify.API.Models;
 using Sprotify.API.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Sprotify.API.Controllers
 {
@@ -23,6 +21,18 @@ namespace Sprotify.API.Controllers
         public IActionResult GetPlaylists()
         {
             var playlists = _sprotifyRepository.GetPlaylists();
+            return Ok(Mapper.Map<IEnumerable<Playlist>>(playlists));
+        }
+
+        [HttpGet("~/api/users/{userId:guid}/playlists")]
+        public IActionResult GetPlaylistsForUser(Guid userId)
+        {
+            if (!_sprotifyRepository.UserExists(userId))
+            {
+                return NotFound();
+            }
+
+            var playlists = _sprotifyRepository.GetPlaylistsFromUser(userId);
             return Ok(Mapper.Map<IEnumerable<Playlist>>(playlists));
         }
 

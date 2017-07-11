@@ -74,6 +74,32 @@ namespace Sprotify.API.Services
             // no code in this implementation
         }
 
+        public bool UserExists(Guid userId)
+        {
+            return _context.Users.Any(x => x.Id == userId);
+        }
+
+        public IEnumerable<User> GetUsers()
+        {
+            return _context.Users.ToList();
+        }
+
+        public User GetUser(Guid userId, bool includePlaylists = false)
+        {
+            var query = _context.Users.Where(x => x.Id == userId);
+            if (includePlaylists)
+            {
+                query = query.Include(x => x.Playlists);
+            }
+
+            return query.FirstOrDefault();
+        }
+
+        public IEnumerable<Playlist> GetPlaylistsFromUser(Guid userId)
+        {
+            return _context.Playlists.Where(x => x.OwnerId == userId).ToList();
+        }
+
         public bool Save()
         {
             return (_context.SaveChanges() >= 0);

@@ -18,6 +18,11 @@ namespace Sprotify.API.Services
         void UpdateSong(Song song);
         void DeleteSong(Song song);
 
+        bool UserExists(Guid userId);
+        IEnumerable<User> GetUsers();
+        User GetUser(Guid userId, bool includePlaylists = false);
+        IEnumerable<Playlist> GetPlaylistsFromUser(Guid userId);
+
         bool Save();
     }
 }
