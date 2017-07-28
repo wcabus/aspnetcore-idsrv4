@@ -82,6 +82,7 @@ namespace Sprotify.API
                 cfg.CreateMap<Entities.User, Models.User>();
                 cfg.CreateMap<Entities.User, Models.UserWithPlaylists>();
 
+                cfg.CreateMap<Models.SongForPlaylist, Entities.PlaylistSong>();
                 
                 cfg.CreateMap<Entities.PlaylistSong, Models.SongInPlaylist>()
                     .ForMember(x => x.Id, opt => opt.MapFrom(src => src.SongId))

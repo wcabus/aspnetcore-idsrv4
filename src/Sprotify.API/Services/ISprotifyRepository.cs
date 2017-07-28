@@ -14,11 +14,18 @@ namespace Sprotify.API.Services
         void CreatePlaylist(Guid ownerId, Playlist playlist);
 
         IEnumerable<Song> GetSongs(string search);
+        Song GetSong(Guid songId);
+
         IEnumerable<SongWithPlaylistInfo> GetSongsFromPlaylist(Guid playlistId);
-        Song GetSongFromPlaylist(Guid playlistId, Guid songId);
-        void AddSongToPlaylist(Guid playlistId, Song song, int index);
+        SongWithPlaylistInfo GetSongFromPlaylist(Guid playlistId, Guid songId);
+
+        void AddSong(Song song);
         void UpdateSong(Song song);
         void DeleteSong(Song song);
+
+        void AddSongToPlaylist(Guid playlistId, Guid songId, int index);
+        void UpdateSongInPlaylist(Guid playlistId, Guid songId, int oldIndex, int newIndex);
+        void RemoveSongFromPlaylist(Guid playlistId, Guid songId, int index);
 
         bool UserExists(Guid userId);
         IEnumerable<User> GetUsers();

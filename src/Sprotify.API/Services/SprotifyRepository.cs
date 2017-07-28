@@ -15,22 +15,6 @@ namespace Sprotify.API.Services
             _context = context;
         }
 
-        public void AddSongToPlaylist(Guid playlistId, Song song, int index)
-        {
-            var playlist = _context.Playlists.FirstOrDefault(x => x.Id == playlistId);
-            playlist.Songs.Add(new PlaylistSong
-            {
-                Playlist = playlist,
-                Song = song,
-                Index = index
-            });
-        }
-
-        public void DeleteSong(Song song)
-        {
-            _context.Songs.Remove(song);
-        }
-
         public void CreatePlaylist(Guid ownerId, Playlist playlist)
         {
             playlist.Id = Guid.NewGuid();
@@ -91,11 +75,25 @@ namespace Sprotify.API.Services
             return query.ToList();
         }
 
-        public Song GetSongFromPlaylist(Guid playlistId, Guid songId)
+        public Song GetSong(Guid songId)
+        {
+            return _context.Songs.FirstOrDefault(x => x.Id == songId);
+        }
+
+        public SongWithPlaylistInfo GetSongFromPlaylist(Guid playlistId, Guid songId)
         {
             return _context.Playlists
                 .Where(x => x.Id == playlistId)
-                .SelectMany(x => x.Songs.Select(y => y.Song))
+                .SelectMany(x => x.Songs)
+                .Select(y => new SongWithPlaylistInfo
+                {
+                    Id = y.SongId,
+                    Band = y.Song.Band,
+                    Duration = y.Song.Duration,
+                    Title = y.Song.Title,
+                    PlaylistId = y.PlaylistId,
+                    Index = y.Index
+                })
                 .FirstOrDefault(x => x.Id == songId);
         }
 
@@ -120,10 +118,72 @@ namespace Sprotify.API.Services
         {
             return _context.Playlists.Any(p => p.Id == playlistId);
         }
-     
+
+        public void AddSong(Song song)
+        {
+            _context.Songs.Add(song);
+        }
+
         public void UpdateSong(Song song)
         {
             // no code in this implementation
+        }
+
+        public void DeleteSong(Song song)
+        {
+            _context.Songs.Remove(song);
+        }
+
+        public void AddSongToPlaylist(Guid playlistId, Guid songId, int index)
+        {
+            var playlist = _context.Playlists.FirstOrDefault(x => x.Id == playlistId);
+            playlist.Songs.Add(new PlaylistSong
+            {
+                PlaylistId = playlist.Id,
+                SongId = songId,
+                Index = index
+            });
+        }
+
+        public void UpdateSongInPlaylist(Guid playlistId, Guid songId, int oldIndex, int newIndex)
+        {
+            var playlist = _context.Playlists.Include(x => x.Songs)
+                .FirstOrDefault(x => x.Id == playlistId);
+
+            var song = playlist.Songs.FirstOrDefault(x => x.SongId == songId && x.Index == oldIndex);
+            playlist.Songs.Remove(song);
+
+            // Reindex the other songs, this might however fail since Index is part of the PK
+            for (var i = 1; i < newIndex && i < playlist.Songs.Count; i++)
+            {
+                if (i < newIndex)
+                {
+                    playlist.Songs.ElementAt(i - 1).Index = i;
+                }
+                else if (i >= newIndex)
+                {
+                    playlist.Songs.ElementAt(i - 1).Index = i + 1;
+                }
+            }
+
+            song.Index = newIndex;
+            playlist.Songs.Add(song);
+        }
+
+        public void RemoveSongFromPlaylist(Guid playlistId, Guid songId, int index)
+        {
+            var playlist = _context.Playlists.Include(x => x.Songs)
+                .FirstOrDefault(x => x.Id == playlistId);
+
+            var song = playlist.Songs.FirstOrDefault(x => x.SongId == songId && x.Index == index);
+            playlist.Songs.Remove(song);
+
+            // Reindex the other songs, this might however fail since Index is part of the PK
+            var newIdx = 1;
+            foreach (var s in playlist.Songs)
+            {
+                s.Index = newIdx++;
+            }
         }
 
         public bool UserExists(Guid userId)

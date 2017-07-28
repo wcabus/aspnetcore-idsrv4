@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Sprotify.API.Controllers
 {
-    [Route("api/playlists/{playlistId}/songs")]
+    [Route("api/songs")]
     public class SongsController : Controller
     {
         private readonly ISprotifyRepository _sprotifyRepository;
@@ -18,14 +18,26 @@ namespace Sprotify.API.Controllers
             _sprotifyRepository = sprotifyRepository;
         }
 
-        [HttpGet("~/api/songs")]
+        [HttpGet]
         public IActionResult GetSongs([FromQuery]string search = null)
         {
             var songs = _sprotifyRepository.GetSongs(search);
             return Ok(Mapper.Map<IEnumerable<Song>>(songs));
         }
 
-        [HttpGet]
+        [HttpGet("{songId}", Name = "GetSong")]
+        public IActionResult GetSong(Guid songId)
+        {
+            var song = _sprotifyRepository.GetSong(songId);
+            if (song == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(Mapper.Map<Song>(song));
+        }
+
+        [HttpGet("~/api/playlists/{playlistId}/songs")]
         public IActionResult GetSongsFromPlaylist(Guid playlistId)
         {
             if (!_sprotifyRepository.PlaylistExists(playlistId))
@@ -37,7 +49,7 @@ namespace Sprotify.API.Controllers
             return Ok(Mapper.Map<IEnumerable<SongInPlaylist>>(songs));
         }
 
-        [HttpGet("{songId}", Name = "GetSongFromPlaylist")]
+        [HttpGet("~/api/playlists/{playlistId}/songs/{songId}", Name = "GetSongFromPlaylist")]
         public IActionResult GetSongFromPlaylist(Guid playlistId, Guid songId)
         {
             if (!_sprotifyRepository.PlaylistExists(playlistId))
@@ -52,12 +64,11 @@ namespace Sprotify.API.Controllers
                 return NotFound();
             }
 
-            return Ok(Mapper.Map<Song>(song));
+            return Ok(Mapper.Map<SongInPlaylist>(song));
         }
 
         [HttpPost]
-        public IActionResult AddSongToPlaylist(Guid playlistId, 
-            [FromBody] SongForCreation songForCreation)
+        public IActionResult CreateSong([FromBody] SongForCreation songForCreation)
         {
             if (songForCreation == null)
             {
@@ -68,34 +79,28 @@ namespace Sprotify.API.Controllers
             {
                 return new UnprocessableEntityObjectResult(ModelState);
             }
-            
-            if (!_sprotifyRepository.PlaylistExists(playlistId))
-            {
-                return NotFound();
-            }
 
             var mappedSong = Mapper.Map<Entities.Song>(songForCreation);
 
-            _sprotifyRepository.AddSongToPlaylist(playlistId, mappedSong, songForCreation.Index);
+            _sprotifyRepository.AddSong(mappedSong);
 
             if (!_sprotifyRepository.Save())
             {
-                throw new Exception($"Adding a song to playlist {playlistId} failed.");
+                throw new Exception("Adding a song failed.");
             }
 
             var createdSongToReturn = Mapper.Map<Models.Song>(mappedSong);
 
-            return CreatedAtRoute("GetSongFromPlaylist", 
-                new {
-                playlistId = playlistId, // todo get from mapped song again?
-                songId = mappedSong.Id }, 
+            return CreatedAtRoute("GetSong",
+                new
+                {
+                    songId = mappedSong.Id
+                },
                 createdSongToReturn);
         }
 
-
         [HttpPut("{songId}")]
-        public IActionResult UpdateSong(Guid playlistId, Guid songId,
-            [FromBody] SongForUpdate songForUpdate)
+        public IActionResult UpdateSong(Guid songId, [FromBody] SongForUpdate songForUpdate)
         {
             if (songForUpdate == null)
             {
@@ -106,13 +111,8 @@ namespace Sprotify.API.Controllers
             {
                 return new UnprocessableEntityObjectResult(ModelState);
             }
-
-            if (!_sprotifyRepository.PlaylistExists(playlistId))
-            {
-                return NotFound();
-            }
-
-            var song = _sprotifyRepository.GetSongFromPlaylist(playlistId, songId);
+            
+            var song = _sprotifyRepository.GetSong(songId);
             if (song == null)
             {
                 return NotFound();
@@ -124,14 +124,14 @@ namespace Sprotify.API.Controllers
 
             if (!_sprotifyRepository.Save())
             {
-                throw new Exception($"Updating song {songId} from playlist {playlistId} failed.");
+                throw new Exception($"Updating song {songId} failed.");
             }
 
             return NoContent();
         }
 
         [HttpPatch("{songId}")]
-        public IActionResult PartiallyUpdateSong(Guid playlistId, Guid songId,
+        public IActionResult PartiallyUpdateSong(Guid songId,
             [FromBody] JsonPatchDocument<SongForUpdate> patchDoc)
         {
             if (patchDoc == null)
@@ -139,12 +139,7 @@ namespace Sprotify.API.Controllers
                 return BadRequest();
             }
 
-            if (!_sprotifyRepository.PlaylistExists(playlistId))
-            {
-                return NotFound();
-            }
-
-            var song = _sprotifyRepository.GetSongFromPlaylist(playlistId, songId);
+            var song = _sprotifyRepository.GetSong(songId);
             if (song == null)
             {
                 return NotFound();
@@ -171,14 +166,92 @@ namespace Sprotify.API.Controllers
 
             if (!_sprotifyRepository.Save())
             {
+                throw new Exception($"Updating song {songId} failed.");
+            }
+
+            return NoContent();
+        }
+
+        [HttpPost("~/api/playlists/{playlistId}/songs")]
+        public IActionResult AddSongToPlaylist(Guid playlistId, [FromBody] SongForPlaylist songForPlaylist)
+        {
+            if (songForPlaylist == null)
+            {
+                return BadRequest();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return new UnprocessableEntityObjectResult(ModelState);
+            }
+
+            if (!_sprotifyRepository.PlaylistExists(playlistId))
+            {
+                return NotFound();
+            }
+
+            var mappedSong = Mapper.Map<Entities.PlaylistSong>(songForPlaylist);
+
+            _sprotifyRepository.AddSongToPlaylist(playlistId, mappedSong.SongId, mappedSong.Index);
+
+            if (!_sprotifyRepository.Save())
+            {
+                throw new Exception($"Adding a song to playlist {playlistId} failed.");
+            }
+
+            var addedSongToReturn = Mapper.Map<Models.SongInPlaylist>(_sprotifyRepository.GetSongFromPlaylist(playlistId, mappedSong.SongId));
+
+            return CreatedAtRoute("GetSongFromPlaylist",
+                new
+                {
+                    playlistId = addedSongToReturn.PlaylistId,
+                    songId = addedSongToReturn.Id
+                },
+                addedSongToReturn);
+        }
+
+        [HttpPut("~/api/playlists/{playlistId}/songs/{songId}")]
+        public IActionResult UpdateSong(Guid playlistId, Guid songId,
+            [FromBody] MoveSongInPlaylist moveSongInPlaylist)
+        {
+            if (moveSongInPlaylist == null)
+            {
+                return BadRequest();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return new UnprocessableEntityObjectResult(ModelState);
+            }
+
+            if (!_sprotifyRepository.PlaylistExists(playlistId))
+            {
+                return NotFound();
+            }
+
+            var song = _sprotifyRepository.GetSongFromPlaylist(playlistId, songId);
+            if (song == null)
+            {
+                return NotFound();
+            }
+
+            if (moveSongInPlaylist.OldIndex == moveSongInPlaylist.NewIndex)
+            {
+                return NoContent();
+            }
+
+            _sprotifyRepository.UpdateSongInPlaylist(playlistId, songId, moveSongInPlaylist.OldIndex, moveSongInPlaylist.NewIndex);
+
+            if (!_sprotifyRepository.Save())
+            {
                 throw new Exception($"Updating song {songId} from playlist {playlistId} failed.");
             }
 
             return NoContent();
         }
 
-        [HttpDelete("{songId}")]
-        public IActionResult DeleteSong(Guid playlistId, Guid songId)
+        [HttpDelete("~/api/playlists/{playlistId}/songs/{songId}")]
+        public IActionResult DeleteSongFromPlaylist(Guid playlistId, Guid songId)
         {
             if (!_sprotifyRepository.PlaylistExists(playlistId))
             {
@@ -191,7 +264,7 @@ namespace Sprotify.API.Controllers
                 return NotFound();
             }
 
-            _sprotifyRepository.DeleteSong(song);
+            _sprotifyRepository.RemoveSongFromPlaylist(song.PlaylistId, song.Id, song.Index);
 
             if (!_sprotifyRepository.Save())
             {
