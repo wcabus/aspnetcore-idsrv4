@@ -55,8 +55,8 @@ namespace Sprotify.API.Controllers
             return Ok(Mapper.Map<Playlist>(playlist));
         }
 
-        [HttpPost]
-        public IActionResult CreatePlaylist([FromBody] PlaylistForCreation playlistForCreation)
+        [HttpPost("~/api/users/{userId:guid}/playlists")]
+        public IActionResult CreatePlaylist(Guid userId, [FromBody] PlaylistForCreation playlistForCreation)
         {
             if (playlistForCreation == null)
             {
@@ -70,7 +70,7 @@ namespace Sprotify.API.Controllers
 
             var mappedPlaylist = Mapper.Map<Entities.Playlist>(playlistForCreation);
 
-            _sprotifyRepository.CreatePlaylist(mappedPlaylist);
+            _sprotifyRepository.CreatePlaylist(userId, mappedPlaylist);
 
             if (!_sprotifyRepository.Save())
             {

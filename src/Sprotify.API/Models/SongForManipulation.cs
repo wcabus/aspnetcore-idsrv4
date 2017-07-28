@@ -14,5 +14,8 @@ namespace Sprotify.API.Models
 
         [Required]
         public TimeSpan Duration { get; set; }
+
+        [Required]
+        public int Index { get; set; }
     }
 }

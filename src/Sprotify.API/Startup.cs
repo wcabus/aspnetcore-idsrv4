@@ -73,13 +73,21 @@ namespace Sprotify.API
             AutoMapper.Mapper.Initialize(cfg =>
             {
                 cfg.CreateMap<Entities.Playlist, Models.Playlist>();
-                cfg.CreateMap<Entities.Playlist, Models.PlaylistWithSongs>();
+                cfg.CreateMap<Services.Models.PlaylistWithSongs, Models.PlaylistWithSongs>();
                 cfg.CreateMap<Models.PlaylistForCreation, Entities.Playlist>();
                 cfg.CreateMap<Entities.Song, Models.Song>();
+                cfg.CreateMap<Services.Models.SongWithPlaylistInfo, Models.SongInPlaylist>();
                 cfg.CreateMap<Models.SongForCreation, Entities.Song>();
                 cfg.CreateMap<Models.SongForUpdate, Entities.Song>().ReverseMap();
                 cfg.CreateMap<Entities.User, Models.User>();
                 cfg.CreateMap<Entities.User, Models.UserWithPlaylists>();
+
+                
+                cfg.CreateMap<Entities.PlaylistSong, Models.SongInPlaylist>()
+                    .ForMember(x => x.Id, opt => opt.MapFrom(src => src.SongId))
+                    .ForMember(x => x.Title, opt => opt.MapFrom(src => src.Song.Title))
+                    .ForMember(x => x.Band, opt => opt.MapFrom(src => src.Song.Band))
+                    .ForMember(x => x.Duration, opt => opt.MapFrom(src => src.Song.Duration));
             });
 
             // test for, and if required, migrate the DB

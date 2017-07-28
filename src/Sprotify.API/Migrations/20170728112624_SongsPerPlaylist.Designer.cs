@@ -8,9 +8,10 @@ using Sprotify.API.Entities;
 namespace Sprotify.API.Migrations
 {
     [DbContext(typeof(SprotifyContext))]
-    partial class SprotifyContextModelSnapshot : ModelSnapshot
+    [Migration("20170728112624_SongsPerPlaylist")]
+    partial class SongsPerPlaylist
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.1")

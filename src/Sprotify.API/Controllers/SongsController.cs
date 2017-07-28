@@ -5,8 +5,6 @@ using Sprotify.API.Models;
 using Sprotify.API.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Sprotify.API.Controllers
 {
@@ -20,6 +18,13 @@ namespace Sprotify.API.Controllers
             _sprotifyRepository = sprotifyRepository;
         }
 
+        [HttpGet("~/api/songs")]
+        public IActionResult GetSongs([FromQuery]string search = null)
+        {
+            var songs = _sprotifyRepository.GetSongs(search);
+            return Ok(Mapper.Map<IEnumerable<Song>>(songs));
+        }
+
         [HttpGet]
         public IActionResult GetSongsFromPlaylist(Guid playlistId)
         {
@@ -29,7 +34,7 @@ namespace Sprotify.API.Controllers
             }
 
             var songs = _sprotifyRepository.GetSongsFromPlaylist(playlistId);
-            return Ok(Mapper.Map<IEnumerable<Song>>(songs));
+            return Ok(Mapper.Map<IEnumerable<SongInPlaylist>>(songs));
         }
 
         [HttpGet("{songId}", Name = "GetSongFromPlaylist")]
@@ -71,7 +76,7 @@ namespace Sprotify.API.Controllers
 
             var mappedSong = Mapper.Map<Entities.Song>(songForCreation);
 
-            _sprotifyRepository.AddSongToPlaylist(playlistId, mappedSong);
+            _sprotifyRepository.AddSongToPlaylist(playlistId, mappedSong, songForCreation.Index);
 
             if (!_sprotifyRepository.Save())
             {
@@ -82,7 +87,7 @@ namespace Sprotify.API.Controllers
 
             return CreatedAtRoute("GetSongFromPlaylist", 
                 new {
-                playlistId = mappedSong.PlaylistId,
+                playlistId = playlistId, // todo get from mapped song again?
                 songId = mappedSong.Id }, 
                 createdSongToReturn);
         }

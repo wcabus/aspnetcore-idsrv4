@@ -3,25 +3,27 @@ using Sprotify.API.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sprotify.API.Services.Models;
 
 namespace Sprotify.API.Services
 {
     public class SprotifyRepository : ISprotifyRepository, IDisposable
     {
-        private static readonly Guid DefaultOwner = Guid.Parse("24ec92ba-e6a3-421f-a599-2a0bf88c807a");
-
         private SprotifyContext _context;
         public SprotifyRepository(SprotifyContext context)
         {
             _context = context;
         }
 
-        public void AddSongToPlaylist(Guid playlistId, Song song)
+        public void AddSongToPlaylist(Guid playlistId, Song song, int index)
         {
-            var playlist = GetPlaylist(playlistId);
-            // create id (could be handled by DB)
-            song.Id = Guid.NewGuid();
-            playlist.Songs.Add(song);
+            var playlist = _context.Playlists.FirstOrDefault(x => x.Id == playlistId);
+            playlist.Songs.Add(new PlaylistSong
+            {
+                Playlist = playlist,
+                Song = song,
+                Index = index
+            });
         }
 
         public void DeleteSong(Song song)
@@ -29,23 +31,48 @@ namespace Sprotify.API.Services
             _context.Songs.Remove(song);
         }
 
-        public void CreatePlaylist(Playlist playlist)
+        public void CreatePlaylist(Guid ownerId, Playlist playlist)
         {
             playlist.Id = Guid.NewGuid();
-            playlist.OwnerId = DefaultOwner;
+            playlist.OwnerId = ownerId;
 
             _context.Playlists.Add(playlist);
         }
 
-        public Playlist GetPlaylist(Guid playlistId, bool includeSongs = false)
+        public PlaylistWithSongs GetPlaylist(Guid playlistId, bool includeSongs = false)
         {
             if (includeSongs)
             {
-                return _context.Playlists.Include(p => p.Songs)
-                    .Where(p => p.Id == playlistId).FirstOrDefault();
+                return _context.Playlists
+                    .Where(x => x.Id == playlistId)
+                    .Select(x => new PlaylistWithSongs
+                    {
+                        Id = x.Id,
+                        OwnerId = x.OwnerId,
+                        Title = x.Title,
+                        Description = x.Description,
+                        Songs = x.Songs.OrderBy(s => s.Index).Select(s => new SongWithPlaylistInfo
+                        {
+                            Id = s.Song.Id,
+                            Title = s.Song.Title,
+                            Band = s.Song.Band,
+                            Duration = s.Song.Duration,
+                            Index = s.Index,
+                            PlaylistId = s.PlaylistId
+                        }).ToList()
+                    })
+                    .FirstOrDefault();
             }
 
-            return _context.Playlists.Where(c => c.Id == playlistId).FirstOrDefault();
+            return _context.Playlists
+                .Select(x => new PlaylistWithSongs
+                {
+                    Id = x.Id,
+                    OwnerId = x.OwnerId,
+                    Title = x.Title,
+                    Description = x.Description
+                })
+                .FirstOrDefault(c => c.Id == playlistId);
         }
 
         public IEnumerable<Playlist> GetPlaylists()
@@ -53,15 +80,40 @@ namespace Sprotify.API.Services
             return _context.Playlists.ToList();
         }
 
-        public Song GetSongFromPlaylist(Guid playlistId, Guid songId)
+        public IEnumerable<Song> GetSongs(string search)
         {
-            return _context.Songs.Where(s => s.PlaylistId == playlistId 
-                         && s.Id == songId).FirstOrDefault();
+            var query = _context.Songs.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(x => x.Band.Contains(search) || x.Title.Contains(search));
+            }
+
+            return query.ToList();
         }
 
-        public IEnumerable<Song> GetSongsFromPlaylist(Guid playlistId)
+        public Song GetSongFromPlaylist(Guid playlistId, Guid songId)
         {
-           return _context.Songs.Where(s => s.PlaylistId == playlistId).ToList();
+            return _context.Playlists
+                .Where(x => x.Id == playlistId)
+                .SelectMany(x => x.Songs.Select(y => y.Song))
+                .FirstOrDefault(x => x.Id == songId);
+        }
+
+        public IEnumerable<SongWithPlaylistInfo> GetSongsFromPlaylist(Guid playlistId)
+        {
+            return _context.Playlists.Where(x => x.Id == playlistId)
+                .SelectMany(x => x.Songs)
+                .OrderBy(x => x.Index)
+                .Select(y => new SongWithPlaylistInfo
+                {
+                    Id = y.SongId,
+                    Band = y.Song.Band,
+                    Duration = y.Song.Duration,
+                    Title = y.Song.Title,
+                    PlaylistId = y.PlaylistId,
+                    Index = y.Index
+                })
+                .ToList();
         }
 
         public bool PlaylistExists(Guid playlistId)
@@ -124,3 +176,4 @@ namespace Sprotify.API.Services
         }
     }
 }
+

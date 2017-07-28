@@ -1,6 +1,7 @@
 ﻿using Sprotify.API.Entities;
 using System;
 using System.Collections.Generic;
+using Sprotify.API.Services.Models;
 
 namespace Sprotify.API.Services
 {
@@ -8,13 +9,14 @@ namespace Sprotify.API.Services
     {
         bool PlaylistExists(Guid playlistId);
         IEnumerable<Playlist> GetPlaylists();
-        Playlist GetPlaylist(Guid playlistId, bool includeSongs = false);
-        IEnumerable<Song> GetSongsFromPlaylist(Guid playlistId);
+        PlaylistWithSongs GetPlaylist(Guid playlistId, bool includeSongs = false);
+
+        void CreatePlaylist(Guid ownerId, Playlist playlist);
+
+        IEnumerable<Song> GetSongs(string search);
+        IEnumerable<SongWithPlaylistInfo> GetSongsFromPlaylist(Guid playlistId);
         Song GetSongFromPlaylist(Guid playlistId, Guid songId);
-
-        void CreatePlaylist(Playlist playlist);
-
-        void AddSongToPlaylist(Guid playlistId, Song song);
+        void AddSongToPlaylist(Guid playlistId, Song song, int index);
         void UpdateSong(Song song);
         void DeleteSong(Song song);
 
