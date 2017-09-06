@@ -75,8 +75,7 @@ namespace Sprotify.Web
                 cfg.CreateMap<Models.Api.PlaylistWithSongs, Models.Music.PlaylistDetails>();
                 cfg.CreateMap<Models.Api.Song, Models.Music.Song>();
             });
-
-
+            
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationScheme = "Cookies"
