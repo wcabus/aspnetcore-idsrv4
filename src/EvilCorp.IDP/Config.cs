@@ -59,7 +59,9 @@ namespace EvilCorp.IDP
                     },
                         
                     // scopes that client has access to
-                    AllowedScopes = { "openid", "profile", "address" }
+                    AllowedScopes = { "openid", "profile", "address" },
+
+                    RedirectUris = { "https://localhost:44396/signin-oidc" }
                 }
             };
         }

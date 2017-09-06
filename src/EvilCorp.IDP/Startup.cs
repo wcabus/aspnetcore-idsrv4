@@ -26,6 +26,8 @@ namespace EvilCorp.IDP
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)
         {
             loggerFactory.AddConsole(LogLevel.Debug);
+            loggerFactory.AddDebug();
+
             app.UseDeveloperExceptionPage();
 
             app.UseIdentityServer();

@@ -1,10 +1,16 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Sprotify.Web.Services;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Sprotify.Web
 {
@@ -68,6 +74,53 @@ namespace Sprotify.Web
                 cfg.CreateMap<Models.Api.Playlist, Models.Music.PlaylistInYourMusic>();
                 cfg.CreateMap<Models.Api.PlaylistWithSongs, Models.Music.PlaylistDetails>();
                 cfg.CreateMap<Models.Api.Song, Models.Music.Song>();
+            });
+
+
+            app.UseCookieAuthentication(new CookieAuthenticationOptions
+            {
+                AuthenticationScheme = "Cookies"
+            });
+
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
+            app.UseOpenIdConnectAuthentication(new OpenIdConnectOptions
+            {
+                AuthenticationScheme = "oidc",
+                Authority = "https://localhost:44375/",
+                RequireHttpsMetadata = true,
+                ClientId = "sprotifyclient",
+                Scope = {"openid", "profile" },
+                ResponseType = "code id_token",
+                SignInScheme = "Cookies",
+                SaveTokens = true,
+                ClientSecret = "secret",
+                GetClaimsFromUserInfoEndpoint = true,
+                Events = new OpenIdConnectEvents()
+                {
+                    // optional: get rid of claims that aren't needed
+                    //OnTokenValidated = tokenValidatedContext =>
+                    //{
+                    //    var identity = tokenValidatedContext.Ticket.Principal.Identity
+                    //        as ClaimsIdentity;
+
+                    //    var subjectClaim = identity.Claims.FirstOrDefault(z => z.Type == "sub");
+
+                    //    var newClaimsIdentity = new ClaimsIdentity(
+                    //      tokenValidatedContext.Ticket.AuthenticationScheme,
+                    //      "given_name",
+                    //      "role");
+
+                    //    newClaimsIdentity.AddClaim(subjectClaim);
+
+                    //    tokenValidatedContext.Ticket = new AuthenticationTicket(
+                    //        new ClaimsPrincipal(newClaimsIdentity),
+                    //        tokenValidatedContext.Ticket.Properties,
+                    //        tokenValidatedContext.Ticket.AuthenticationScheme);
+
+                    //    return Task.CompletedTask; 
+                    //}
+                }
             });
 
             app.UseStaticFiles();
