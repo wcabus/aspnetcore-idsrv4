@@ -4,5 +4,9 @@
         <a href="/settings/account">
             <span class="user-link">@Model.Name</span>
         </a>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <a asp-area="" asp-controller="Logout" asp-action="Logout"><span class="user-link">(Logout)</span></a>
+        }
     </div>
 </div>
