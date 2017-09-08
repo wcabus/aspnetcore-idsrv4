@@ -29,7 +29,7 @@ namespace Sprotify.API
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvcCore().AddJsonFormatters().AddDataAnnotations();
+            services.AddMvcCore().AddJsonFormatters().AddDataAnnotations().AddAuthorization();
                      
             // Never put a production connection string in an appsettings file.  
             // Use environment variables for that.
@@ -96,7 +96,14 @@ namespace Sprotify.API
 
             // ensure seed data
             sprotifyContext.EnsureSeedDataForContext();
-           
+
+            app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
+            {
+                Authority = "https://localhost:44375/",
+                RequireHttpsMetadata = true,
+                ApiName = "sprotifyapi"
+            });
+
             app.UseMvc();             
         }
     }

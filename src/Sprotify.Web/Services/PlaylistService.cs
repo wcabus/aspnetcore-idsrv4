@@ -8,7 +8,7 @@ namespace Sprotify.Web.Services
 {
     public class PlaylistService : ApiServiceBase
     {
-        public PlaylistService(HttpClient client, string baseUri) : base(client, baseUri) { }
+        public PlaylistService(SprotifyHttpClient client) : base(client) { }
 
         public async Task<IEnumerable<Playlist>> GetPlaylists()
         {

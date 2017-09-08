@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Sprotify.API.Models;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 
 namespace Sprotify.API.Controllers
 {
+    [Authorize]
     [Route("api/songs")]
     public class SongsController : Controller
     {

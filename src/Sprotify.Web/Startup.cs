@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -23,10 +24,11 @@ namespace Sprotify.Web
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
+
             Configuration = builder.Build();
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public static IConfigurationRoot Configuration { get; set; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -35,11 +37,19 @@ namespace Sprotify.Web
             services.AddOptions();
 
             // Add services
-            var client = new HttpClient();
-            var baseUri = Configuration.GetValue<string>("ApiBaseUri");
 
-            services.AddScoped(isp => new PlaylistService(client, baseUri));
-            services.AddScoped(isp => new StatsService(client, baseUri));
+            // register an IHttpContextAccessor so we can access the current
+            // HttpContext in services by injecting it
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            // register a SprotifyHttpClient
+            services.AddScoped<SprotifyHttpClient>();
+
+            services.AddScoped<PlaylistService>();
+            services.AddScoped<StatsService>();
+         
+            //services.AddScoped(isp => new PlaylistService(client, baseUri));
+            //services.AddScoped(isp => new StatsService(client, baseUri));
 
             // Add MVC services
             services.AddMvc();
@@ -89,7 +99,7 @@ namespace Sprotify.Web
                 Authority = "https://localhost:44375/",
                 RequireHttpsMetadata = true,
                 ClientId = "sprotifyclient",
-                Scope = {"openid", "profile" },
+                Scope = {"openid", "profile", "sprotifyapi", "offline_access" },
                 ResponseType = "code id_token",
                 SignInScheme = "Cookies",
                 SaveTokens = true,

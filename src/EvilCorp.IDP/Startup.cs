@@ -18,6 +18,7 @@ namespace EvilCorp.IDP
                 .AddTemporarySigningCredential()
                 .AddInMemoryClients(Config.GetClients())
                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
+                .AddInMemoryApiResources(Config.GetApiResources())
                 .AddTestUsers(Config.GetUsers());
 
             services.AddMvc();

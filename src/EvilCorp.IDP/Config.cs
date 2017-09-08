@@ -59,7 +59,9 @@ namespace EvilCorp.IDP
                     },
                         
                     // scopes that client has access to
-                    AllowedScopes = { "openid", "profile", "address" },
+                    AllowedScopes = { "openid", "profile", "address", "sprotifyapi" },
+
+                    AllowOfflineAccess = true,
 
                     RedirectUris = { "https://localhost:44396/signin-oidc" }, 
                     PostLogoutRedirectUris = { "https://localhost:44396/signout-callback-oidc" }
@@ -75,6 +77,14 @@ namespace EvilCorp.IDP
                 new IdentityResources.OpenId(),
                 new IdentityResources.Profile(),
                 new IdentityResources.Address(),
+            };
+        }
+
+        public static IEnumerable<ApiResource> GetApiResources()
+        {
+            return new List<ApiResource>
+            {
+                new ApiResource("sprotifyapi", "Sprotify API")                 
             };
         }
     }
