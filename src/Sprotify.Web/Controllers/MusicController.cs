@@ -5,11 +5,9 @@ using Sprotify.Web.Services;
 using System.Threading.Tasks;
 using AutoMapper;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Sprotify.Web.Controllers
 {
-    [Authorize]
     public class MusicController : Controller
     {
         private readonly PlaylistService _playlistService;

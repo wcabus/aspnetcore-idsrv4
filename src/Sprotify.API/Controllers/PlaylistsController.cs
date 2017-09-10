@@ -1,15 +1,12 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sprotify.API.Models;
 using Sprotify.API.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Sprotify.API.Controllers
 {
-    [Authorize]
     [Route("api/playlists")]
     public class PlaylistsController : Controller
     {
@@ -23,9 +20,7 @@ namespace Sprotify.API.Controllers
         [HttpGet]
         public IActionResult GetPlaylists()
         {
-            var ownerId = User.Claims.FirstOrDefault(c => c.Type == "sub").Value;
-
-            var playlists = _sprotifyRepository.GetPlaylistsFromUser(Guid.Parse(ownerId));
+            var playlists = _sprotifyRepository.GetPlaylists();
             return Ok(Mapper.Map<IEnumerable<Playlist>>(playlists));
         }
 

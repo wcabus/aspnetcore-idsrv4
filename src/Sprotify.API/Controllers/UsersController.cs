@@ -4,11 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Sprotify.API.Models;
 using Sprotify.API.Services;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Sprotify.API.Controllers
 {
-    [Authorize]
     [Route("api/users")]
     public class UsersController : Controller
     {

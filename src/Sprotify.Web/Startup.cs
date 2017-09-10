@@ -1,17 +1,10 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Sprotify.Web.Services;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Net.Http;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace Sprotify.Web
 {
@@ -24,11 +17,10 @@ namespace Sprotify.Web
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
-
             Configuration = builder.Build();
         }
 
-        public static IConfigurationRoot Configuration { get; set; }
+        public IConfigurationRoot Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -37,19 +29,11 @@ namespace Sprotify.Web
             services.AddOptions();
 
             // Add services
+            var client = new HttpClient();
+            var baseUri = Configuration.GetValue<string>("ApiBaseUri");
 
-            // register an IHttpContextAccessor so we can access the current
-            // HttpContext in services by injecting it
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-
-            // register a SprotifyHttpClient
-            services.AddScoped<SprotifyHttpClient>();
-
-            services.AddScoped<PlaylistService>();
-            services.AddScoped<StatsService>();
-         
-            //services.AddScoped(isp => new PlaylistService(client, baseUri));
-            //services.AddScoped(isp => new StatsService(client, baseUri));
+            services.AddScoped(isp => new PlaylistService(client, baseUri));
+            services.AddScoped(isp => new StatsService(client, baseUri));
 
             // Add MVC services
             services.AddMvc();
@@ -84,52 +68,6 @@ namespace Sprotify.Web
                 cfg.CreateMap<Models.Api.Playlist, Models.Music.PlaylistInYourMusic>();
                 cfg.CreateMap<Models.Api.PlaylistWithSongs, Models.Music.PlaylistDetails>();
                 cfg.CreateMap<Models.Api.Song, Models.Music.Song>();
-            });
-            
-            app.UseCookieAuthentication(new CookieAuthenticationOptions
-            {
-                AuthenticationScheme = "Cookies"
-            });
-
-            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-
-            app.UseOpenIdConnectAuthentication(new OpenIdConnectOptions
-            {
-                AuthenticationScheme = "oidc",
-                Authority = "https://localhost:44375/",
-                RequireHttpsMetadata = true,
-                ClientId = "sprotifyclient",
-                Scope = {"openid", "profile", "sprotifyapi", "offline_access" },
-                ResponseType = "code id_token",
-                SignInScheme = "Cookies",
-                SaveTokens = true,
-                ClientSecret = "secret",
-                GetClaimsFromUserInfoEndpoint = true,
-                Events = new OpenIdConnectEvents()
-                {
-                    // optional: get rid of claims that aren't needed
-                    //OnTokenValidated = tokenValidatedContext =>
-                    //{
-                    //    var identity = tokenValidatedContext.Ticket.Principal.Identity
-                    //        as ClaimsIdentity;
-
-                    //    var subjectClaim = identity.Claims.FirstOrDefault(z => z.Type == "sub");
-
-                    //    var newClaimsIdentity = new ClaimsIdentity(
-                    //      tokenValidatedContext.Ticket.AuthenticationScheme,
-                    //      "given_name",
-                    //      "role");
-
-                    //    newClaimsIdentity.AddClaim(subjectClaim);
-
-                    //    tokenValidatedContext.Ticket = new AuthenticationTicket(
-                    //        new ClaimsPrincipal(newClaimsIdentity),
-                    //        tokenValidatedContext.Ticket.Properties,
-                    //        tokenValidatedContext.Ticket.AuthenticationScheme);
-
-                    //    return Task.CompletedTask; 
-                    //}
-                }
             });
 
             app.UseStaticFiles();

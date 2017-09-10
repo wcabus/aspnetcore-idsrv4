@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Sprotify.Web.Models.User;
 using System;
 
 namespace Sprotify.Web.Controllers
 {
-    [Authorize]
     public class UserController : Controller
     {
         [Route("user-info/{owner:guid}")]

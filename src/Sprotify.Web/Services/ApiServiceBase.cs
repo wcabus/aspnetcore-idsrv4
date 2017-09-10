@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Net.Http;
 using System.Text;
@@ -9,19 +8,18 @@ namespace Sprotify.Web.Services
 {
     public abstract class ApiServiceBase
     {
-        private readonly SprotifyHttpClient _sprotifyHttpClient;
-       
-        protected ApiServiceBase(SprotifyHttpClient sprotifyHttpClient) 
+        private readonly HttpClient _client;
+        private readonly string _baseUri;
+
+        protected ApiServiceBase(HttpClient client, string baseUri)
         {
-            _sprotifyHttpClient = sprotifyHttpClient;
+            _client = client;
+            _baseUri = baseUri;
         }
 
         protected async Task<T> Get<T>(string resource)
         {
-            // get the client instance
-            var client = await _sprotifyHttpClient.GetClient();
-
-            var response = await client.GetAsync(resource).ConfigureAwait(false);
+            var response = await _client.GetAsync(_baseUri + resource).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
                 var errData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -34,12 +32,9 @@ namespace Sprotify.Web.Services
 
         protected async Task<T> Post<T>(string resource, object data)
         {
-            // get the client instance
-            var client = await _sprotifyHttpClient.GetClient();
-
             var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
-            var response = await client.PostAsync(resource, content).ConfigureAwait(false);
+            var response = await _client.PostAsync(_baseUri + resource, content).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
                 var errData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);

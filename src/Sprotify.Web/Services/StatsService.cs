@@ -8,7 +8,7 @@ namespace Sprotify.Web.Services
 {
     public class StatsService : ApiServiceBase
     {
-        public StatsService(SprotifyHttpClient client) : base(client)
+        public StatsService(HttpClient client, string baseUri) : base(client, baseUri)
         {
         }
 

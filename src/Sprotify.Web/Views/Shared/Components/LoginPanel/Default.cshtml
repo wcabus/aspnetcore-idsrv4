@@ -2,11 +2,8 @@
 <div class="sessionInfo">
     <div class="user-widget">
         <a href="/settings/account">
-            <span class="user-link">@Model.Name</span>
+            <figure class="avatar user-avatar" title="Wesley Cabus" style="background-image: url(&quot;https://scontent.xx.fbcdn.net/v/t1.0-1/p200x200/16508025_10210813409625788_4714354570615556723_n.jpg?oh=6cbdda98ff725b598eb2faf12ea22a0d&amp;oe=597E597B&quot;); width: 28px; height: 28px;"></figure>
+            <span class="user-link">Wesley Cabus</span>
         </a>
-        @if (User.Identity.IsAuthenticated)
-        {
-            <a asp-area="" asp-controller="Logout" asp-action="Logout"><span class="user-link">(Logout)</span></a>
-        }
     </div>
 </div>
