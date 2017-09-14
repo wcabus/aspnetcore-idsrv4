@@ -4,9 +4,12 @@ using Sprotify.API.Models;
 using Sprotify.API.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Sprotify.API.Controllers
 {
+    [Authorize]
     [Route("api/playlists")]
     public class PlaylistsController : Controller
     {
@@ -20,7 +23,8 @@ namespace Sprotify.API.Controllers
         [HttpGet]
         public IActionResult GetPlaylists()
         {
-            var playlists = _sprotifyRepository.GetPlaylists();
+            var ownerId = Guid.Parse(User.Claims.FirstOrDefault(x => x.Type == "sub").Value);
+            var playlists = _sprotifyRepository.GetPlaylistsFromUser(ownerId);
             return Ok(Mapper.Map<IEnumerable<Playlist>>(playlists));
         }
 

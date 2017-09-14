@@ -5,9 +5,11 @@ using Sprotify.API.Models;
 using Sprotify.API.Services;
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Sprotify.API.Controllers
 {
+    [Authorize]
     [Route("api/songs")]
     public class SongsController : Controller
     {

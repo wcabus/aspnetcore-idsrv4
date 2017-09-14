@@ -8,18 +8,17 @@ namespace Sprotify.Web.Services
 {
     public abstract class ApiServiceBase
     {
-        private readonly HttpClient _client;
-        private readonly string _baseUri;
+        private readonly SprotifyHttpClient _sprotifyclient;
 
-        protected ApiServiceBase(HttpClient client, string baseUri)
+        protected ApiServiceBase(SprotifyHttpClient sprotifyclient)
         {
-            _client = client;
-            _baseUri = baseUri;
+            _sprotifyclient = sprotifyclient;
         }
 
         protected async Task<T> Get<T>(string resource)
         {
-            var response = await _client.GetAsync(_baseUri + resource).ConfigureAwait(false);
+            var client = await _sprotifyclient.GetClient();
+            var response = await client.GetAsync(resource).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
                 var errData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -34,7 +33,8 @@ namespace Sprotify.Web.Services
         {
             var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
-            var response = await _client.PostAsync(_baseUri + resource, content).ConfigureAwait(false);
+            var client = await _sprotifyclient.GetClient();
+            var response = await client.PostAsync(resource, content).ConfigureAwait(false);
             if (!response.IsSuccessStatusCode)
             {
                 var errData = await response.Content.ReadAsStringAsync().ConfigureAwait(false);

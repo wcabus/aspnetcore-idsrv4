@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Linq;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using Sprotify.Web.Models.User;
 using System.Threading.Tasks;
 
@@ -8,14 +10,12 @@ namespace Sprotify.Web.ViewComponents
     {
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return View("Login");
-            }
-
+            var ci = User.Identity as ClaimsIdentity;
+            var name = $"{ci.Claims.FirstOrDefault(x => x.Type == "given_name")?.Value} {ci.Claims.FirstOrDefault(x => x.Type == "family_name")?.Value}";
+            
             return View(new LoginPanelModel
             {
-                Name = User.Identity.Name
+                Name = name
             });
         }
     }
